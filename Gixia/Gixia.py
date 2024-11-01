@@ -16,25 +16,36 @@ def index() -> rx.Component:
     return rx.container(
         rx.color_mode.button(position="top-right"),
         rx.vstack(
-            rx.heading("Gixia", size="9", align="center"),
-            rx.heading("A community to share your review of papers.", size="5"),
+            rx.heading(
+                "Score the Papers",
+                size="9",
+                align="center",
+            ),
+            rx.text(
+                "A platform to score the papers and share your reviews with the community.",
+                size="3",
+                color="gray",
+                align="center",
+            ),
             rx.input(
                 placeholder="Input a paper title, arxiv link or arxiv id to get started",
                 type="text",
-                width="50%",
-                margin="10",
-                align="center",
+                width="60%",
+                height="40px",
+                margin_top="10px",
             ),
             rx.link(
-                rx.button("Go to"),
+                rx.button("Go to", width="100px"),
                 href="#",
                 is_external=False,
             ),
             spacing="5",
             justify="center",
             min_height="85vh",
+            align="center",
         ),
-        rx.logo()
+        rx.logo(),
+        size="3",
     )
 
 
