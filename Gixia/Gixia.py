@@ -46,6 +46,7 @@ def index() -> rx.Component:
         ),
         rx.logo(),
         size="3",
+        background_color=rx.color("gold", 3)
     )
 
 
