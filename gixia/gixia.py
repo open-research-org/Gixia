@@ -10,19 +10,19 @@ class State(rx.State):
 
     ...
 
-
+@rx.page(route="/")
 def index() -> rx.Component:
     # Welcome Page (Index)
     return rx.container(
         rx.color_mode.button(position="top-right"),
         rx.vstack(
             rx.heading(
-                "Score the Papers",
+                "Rate the Papers",
                 size="9",
                 align="center",
             ),
             rx.text(
-                "A platform to score the papers and share your reviews with the community.",
+                "A platform to rate the papers and share your comments with the community.",
                 size="3",
                 color="gray",
                 align="center",
@@ -51,4 +51,3 @@ def index() -> rx.Component:
 
 
 app = rx.App()
-app.add_page(index)
