@@ -50,4 +50,15 @@ def index() -> rx.Component:
     )
 
 
-app = rx.App()
+app = rx.App(
+    stylesheets=[
+        "https://fonts.googleapis.com/css?family=Hanken+Grotesk",
+    ],
+    theme=rx.theme(
+        accent_color="gold",
+        gray_color="gray",
+    ),
+    style={
+        "font-family": "Hanken Grotesk",
+    }
+)
