@@ -1,26 +1,40 @@
 import reflex as rx
 
+from gixia.core.service import service
 
-@rx.page(route="/paper")
+
+class State(rx.State):
+
+    arxiv_id: str = ""
+    title: str = ""
+    authors: str = ""
+    abstract: str = ""
+
+    def on_load(self):
+        self.arxiv_id = self.router.page.params.get("_arxiv_id")
+        paper = service.get_paper(self.arxiv_id)
+        if paper:
+            self.title = paper['title']
+            self.authors = paper['authors']
+            self.abstract = paper['abstract']
+
+@rx.page(route="/paper/[_arxiv_id]", on_load=State.on_load)
 def paper() -> rx.Component:
     return rx.container(
         rx.color_mode.button(position="top-right"),
         rx.hstack(
             rx.vstack(
                 rx.heading(
-                    "Nova: An Iterative Planning and Search Approach to Enhance Novelty and Diversity of LLM Generated Ideas",
+                    State.title,
                     size="7",
                 ),
                 rx.text(
-                    "Xiang Hu, Hongyu Fu, Jinge Wang, Yifeng Wang, Zhikun Li, Renjun Xu, Yu Lu, Yaochu Jin, Lili Pan, Zhenzhong Lan",
+                    State.authors,
                     size="2",
                     color="gray",
                 ),
                 rx.text(
-                    "Scientific innovation is pivotal for humanity, and harnessing large language"
-                    "models (LLMs) to generate research ideas could transform discovery. "
-                    "However, existing LLMs often produce simplistic and repetitive suggestions"
-                    "due to their limited ability in acquiring external knowledge for innovation.",
+                    State.abstract,
                     size="3",
                     color=rx.color("black", 8),
                 ),
@@ -68,6 +82,5 @@ def paper() -> rx.Component:
             margin_top="50px",
         ),
         size="4",
-        height="100vh",
         background_color=rx.color("gold", 3),
     )

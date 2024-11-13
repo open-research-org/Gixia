@@ -1,3 +1,4 @@
+google-auth[requests]
 pymongo
 reflex
 sickle

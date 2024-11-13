@@ -1,18 +1,25 @@
-"""Welcome to Reflex! This file outlines the steps to create a basic app."""
-
+from google.auth.transport import requests
+from google.oauth2.id_token import verify_oauth2_token
 import reflex as rx
 
-from rxconfig import config
+from gixia.pages.react_oauth_google import get_client_id, GoogleOAuthProvider, GoogleLogin
 
 
 class State(rx.State):
-    """The app state."""
 
-    ...
+    input: str = ""
+
+    def on_success(self, id_token: dict):
+        print(
+            verify_oauth2_token(
+                id_token["credential"],
+                requests.Request(),
+                get_client_id(),
+            )
+        )
 
 @rx.page(route="/")
 def index() -> rx.Component:
-    # Welcome Page (Index)
     return rx.container(
         rx.color_mode.button(position="top-right"),
         rx.vstack(
@@ -30,14 +37,19 @@ def index() -> rx.Component:
             rx.input(
                 placeholder="Input a paper title, arxiv link or arxiv id to get started",
                 type="text",
+                on_change=State.set_input,
                 width="60%",
                 height="40px",
                 margin_top="10px",
             ),
             rx.link(
                 rx.button("Go to", width="100px"),
-                href="#",
+                href=f"/paper/{State.input}",
                 is_external=False,
+            ),
+            GoogleOAuthProvider.create(
+                GoogleLogin.create(on_success=State.on_success),
+                client_id=get_client_id(),
             ),
             spacing="5",
             justify="center",
@@ -46,7 +58,7 @@ def index() -> rx.Component:
         ),
         rx.logo(),
         size="3",
-        background_color=rx.color("gold", 3)
+        background_color=rx.color("gold", 3),
     )
 
 
