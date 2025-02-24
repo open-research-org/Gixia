@@ -1,9 +1,11 @@
 import reflex as rx
 
+from gixia.components.header import header
 from gixia.core.service import service
+from gixia.states.base_state import BaseState
 
 
-class State(rx.State):
+class State(BaseState):
 
     arxiv_id: str = ""
     title: str = ""
@@ -21,7 +23,7 @@ class State(rx.State):
 @rx.page(route="/paper/[_arxiv_id]", on_load=State.on_load)
 def paper() -> rx.Component:
     return rx.container(
-        rx.color_mode.button(position="top-right"),
+        header(),
         rx.hstack(
             rx.vstack(
                 rx.heading(

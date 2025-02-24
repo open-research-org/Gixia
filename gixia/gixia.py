@@ -2,26 +2,27 @@ from google.auth.transport import requests
 from google.oauth2.id_token import verify_oauth2_token
 import reflex as rx
 
+from gixia.components.header import header
 from gixia.pages.react_oauth_google import get_client_id, GoogleOAuthProvider, GoogleLogin
+from gixia.states.base_state import BaseState
 
 
-class State(rx.State):
-
+class State(BaseState):
     input: str = ""
 
     def on_success(self, id_token: dict):
-        print(
-            verify_oauth2_token(
-                id_token["credential"],
-                requests.Request(),
-                get_client_id(),
-            )
+        user_info = verify_oauth2_token(
+            id_token["credential"],
+            requests.Request(),
+            get_client_id(),
         )
+        self.user_name = user_info.get("name", "User")
+        self.is_logged_in = True
 
 @rx.page(route="/")
 def index() -> rx.Component:
     return rx.container(
-        rx.color_mode.button(position="top-right"),
+        header(),
         rx.vstack(
             rx.heading(
                 "Rate the Papers",
