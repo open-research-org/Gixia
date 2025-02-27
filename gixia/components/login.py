@@ -1,5 +1,44 @@
+import os
+
+from google.auth.transport import requests
+from google.oauth2.id_token import verify_oauth2_token
 import reflex as rx
 
+from gixia.states.base_state import BaseState
+
+
+class State(BaseState):
+
+    def on_success(self, id_token: dict):
+        user_info = verify_oauth2_token(
+            id_token["credential"],
+            requests.Request(),
+            get_client_id(),
+        )
+        print(user_info)
+        if user_info:
+            email = user_info.get('email')
+            name = user_info.get('name')
+        self.is_logged_in = True
+
+        # TODO: Add user to database if not exists
+        # TODO: Save user id to base state
+
+def get_client_id() -> str:
+    return os.environ["GOOGLE_AUTH_CLIENT_ID"]
+
+class GoogleOAuthProvider(rx.Component):
+    library = "@react-oauth/google"
+    tag = "GoogleOAuthProvider"
+
+    client_id: rx.Var[str]
+
+
+class GoogleLogin(rx.Component):
+    library = "@react-oauth/google"
+    tag = "GoogleLogin"
+
+    on_success: rx.EventHandler[lambda data: [data]]
 
 def login_button() -> rx.Component:
     return rx.dialog.root(
@@ -16,50 +55,17 @@ def login_button() -> rx.Component:
             ),
         ),
         rx.dialog.content(
-            rx.dialog.title(
-                "Add New User",
-            ),
-            rx.dialog.description(
-                "Fill the form with the user's info",
-            ),
-            rx.form(
-                rx.flex(
-                    rx.input(
-                        placeholder="User Name",
-                        name="name",
-                        required=True,
+            rx.vstack(
+                GoogleOAuthProvider.create(
+                    GoogleLogin.create(
+                        on_success=State.on_success,
                     ),
-                    rx.input(
-                        placeholder="user@reflex.dev",
-                        name="email",
-                    ),
-                    rx.select(
-                        ["Male", "Female"],
-                        placeholder="Male",
-                        name="gender",
-                    ),
-                    rx.flex(
-                        rx.dialog.close(
-                            rx.button(
-                                "Cancel",
-                                variant="soft",
-                                color_scheme="gray",
-                            ),
-                        ),
-                        rx.dialog.close(
-                            rx.button(
-                                "Submit", type="submit"
-                            ),
-                        ),
-                        spacing="3",
-                        justify="end",
-                    ),
-                    direction="column",
-                    spacing="4",
+                    client_id=get_client_id(),
                 ),
-                # on_submit=State.add_user,
-                reset_on_submit=False,
+                spacing="6",
+                width="100%",
+                align_items="center",
             ),
-            max_width="450px",
+            max_width="400px",
         ),
     )
