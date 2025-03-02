@@ -46,8 +46,8 @@ while True:
 
 # Connect to a MongoDB database
 client = pymongo.MongoClient('mongodb://localhost:27017/')
-db = client['arxiv']
-collection = db['metadata']
+db = client['gixia']
+collection = db['papers']
 
 updated_count = 0
 inserted_count = 0
