@@ -7,10 +7,10 @@ def header() -> rx.Component:
     return rx.hstack(
         rx.spacer(),
         rx.cond(
-            BaseState.is_logged_in,
+            BaseState.user,
             rx.link(
                 rx.button(
-                    BaseState.user_name,
+                    BaseState.user.name,
                     background_color="transparent",
                     border="none",
                     color=rx.color_mode_cond(
