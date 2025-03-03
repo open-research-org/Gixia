@@ -1,4 +1,5 @@
 google-auth[requests]
+kagglehub
 pymongo
 reflex
 sickle

@@ -3,6 +3,7 @@ import logging
 import os
 import pymongo
 
+from gixia.core.paper import Paper
 from gixia.core.user import User
 
 
@@ -19,16 +20,59 @@ class Database:
         # Initialize database connection and setup collections.
         username = os.environ['MONGO_USERNAME']
         password = os.environ['MONGO_PASSWORD']
-        self.client = pymongo.MongoClient(f'mongodb://{username}:{password}@20.2.82.55:27017/')
+        ip_address = os.environ['GIXIA_ADDRESS']
+        self.client = pymongo.MongoClient(f'mongodb://{username}:{password}@{ip_address}:27017/')
         db = self.client['gixia']
         self.papers_collection = db['papers']
         self.users_collection = db['users']
 
-    def get_paper(self, arxiv_id):
+    def get_paper(self, id: str) -> Paper | None:
         """
-        Get the paper specified by arXiv ID.
+        Get the paper specified by ID.
         """
-        return self.papers_collection.find_one({'id': arxiv_id})
+        paper_document = self.papers_collection.find_one({'id': id})
+        return Paper.from_document(paper_document) if paper_document else None
+
+    def get_papers(self, ids: list[str]) -> list[Paper]:
+        """
+        Get the papers specified by IDs. If a paper is not found, it will be ignored.
+        """
+        paper_documents = self.papers_collection.find({'id': {'$in': ids}})
+        return [Paper.from_document(doc) for doc in paper_documents if doc]
+
+    def add_paper(self, paper):
+        """
+        Add a paper to the database.
+        """
+        self.papers_collection.insert_one(asdict(paper))
+
+    def update_papers(self, papers: list[Paper]):
+        """
+        Update a list of papers in the database.
+        """
+        if not papers:
+            return
+        operations = [
+            pymongo.UpdateOne(
+                {'id': paper.id},
+                {'$set': asdict(paper)}
+            ) for paper in papers
+        ]
+        self.papers_collection.bulk_write(operations)
+
+    def add_papers(self, papers: list[Paper]):
+        """
+        Add a list of papers to the database.
+        """
+        if not papers:
+            return
+        self.papers_collection.insert_many([asdict(paper) for paper in papers])
+
+    def update_paper(self, paper):
+        """
+        Update a paper in the database.
+        """
+        self.papers_collection.update_one({'id': paper.id}, {'$set': asdict(paper)})
 
     def get_user(self, email) -> User:
         """

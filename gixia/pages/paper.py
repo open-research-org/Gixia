@@ -16,9 +16,9 @@ class State(BaseState):
         self.arxiv_id = self.router.page.params.get("_arxiv_id")
         paper = service.get_paper(self.arxiv_id)
         if paper:
-            self.title = paper['title']
-            self.authors = paper['authors']
-            self.abstract = paper['abstract']
+            self.title = paper.title
+            self.authors = ', '.join(paper.authors)
+            self.abstract = paper.abstract
 
 @rx.page(route="/paper/[_arxiv_id]", on_load=State.on_load)
 def paper() -> rx.Component:

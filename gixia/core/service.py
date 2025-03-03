@@ -1,4 +1,5 @@
 from gixia.core.database import Database
+from gixia.core.paper import Paper
 from gixia.core.user import User
 
 
@@ -9,12 +10,15 @@ class Service():
         """
         self.database = Database()
 
-    def get_paper(self, arxiv_id: str):
+    def get_paper(self, arxiv_id: str) -> Paper | None:
         """
         Get the paper specified by arXiv ID.
 
         Args:
             arxiv_id (str): The arXiv ID of the paper. Should in format: 'YYMM.XXXXX'.
+
+        Returns:
+            Paper: The paper object. None if not found.
         """
         return self.database.get_paper(arxiv_id)
 
